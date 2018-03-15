@@ -246,8 +246,8 @@ class showMainWin extends Frame{
 			}
 		}
 		public void moveUp() {
-			for(int a=0;a<4;a++) {
-				for(int b=0;b<4;b++) {
+			for(int b=0;b<4;b++) {
+				for(int a=0;a<4;a++) {
 					if(latticebox[a][b].numValue!=0) {
 						w_list.add(latticebox[a][b]);
 					}
@@ -345,8 +345,8 @@ class showMainWin extends Frame{
 			}		
 		}
 		public void moveLeft() {
-			for(int a=0;a<4;a++) {
-				for(int b=0;b<4;b++) {
+			for(int b=0;b<4;b++) {
+				for(int a=0;a<4;a++) {
 					if(latticebox[a][b].numValue!=0) {
 						l_list.add(latticebox[a][b]);
 					}
