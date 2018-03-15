@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import javax.swing.SwingConstants;
@@ -36,14 +37,16 @@ public class main {
 class showMainWin extends Frame{
 	int maxNumber ;
 	int top_score ;
+	int latticesNum ;
 	lattice[][] latticebox = new lattice[4][4];
 	Panel panel ;
 	Button newGame ;
 	Label score_label;
 	Label addScore_label ;
+	Label name_topScore ;
 	Reader reader ; 
 	Properties p ;
-	Font f_main = new Font("Arial",Font.BOLD,44);
+	Font f_main = new Font("Arial",Font.BOLD,38);
 	showMainWin(){
 		setBounds(200,200,600,800);
 		setVisible(true);
@@ -68,7 +71,7 @@ class showMainWin extends Frame{
 		name_lable.setForeground(new Color(210,180,140));
 		Font f = new Font("Arial",Font.BOLD,78);
 		name_lable.setFont(f);
-		Label name_topScore = new Label("",Label.CENTER);
+		name_topScore = new Label("",Label.CENTER);
 		name_topScore.setBackground(new Color(245,222,179));
 		name_topScore.setBounds(425,70,150,45);
 		name_topScore.setFont(f_score);
@@ -94,7 +97,7 @@ class showMainWin extends Frame{
 		name_topScore.setText(showTopScore());
 		LaunchMainLabel();
 		this.add(panel);
-		//√ø∏ˆ–°∏Ò125*125
+		//ÊØè‰∏™Â∞èÊ†º125*125
 		for(int a = 0 ;a<4;a++) {
 			for(int b=0;b<4;b++) {
 				lattice lat = new lattice();
@@ -121,6 +124,7 @@ class showMainWin extends Frame{
 		panel.setLayout(null);
 		panel.setBackground(new Color(238,232,170));
 		panel.setBounds(25,155,550,550);
+		panel.requestFocus();
 	}
 	public void launchLattice(int latNum){
 		List emptyList = new ArrayList();
@@ -133,31 +137,37 @@ class showMainWin extends Frame{
 		}
 		Iterator i = emptyList.iterator();
 		Collections.shuffle(emptyList); 
-		//ÀÊª˙¥Ú¬“ArrayList
-		if(latNum==1) {
-			lattice latChangeNum = (lattice)i.next();
-			latChangeNum.numValue = 2 ;
-			try {
-				latChangeNum.setBackground(Color.WHITE);
-				latChangeNum.setForeground(Color.BLACK);
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		//ÈöèÊú∫Êâì‰π±ArrayList
+		try {
+			if(latNum==1) {
+				lattice latChangeNum = (lattice)i.next();
+				latChangeNum.numValue = 2 ;
+				try {
+					latChangeNum.setBackground(Color.WHITE);
+					latChangeNum.setForeground(Color.BLACK);
+					Thread.sleep(150);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				latChangeNum.setForeground(Color.WHITE);
+				changeLattice(latChangeNum);
+			}else if(latNum==2) { 
+				//ËøõË°åÁ¨¨‰∏ÄÊ¨°ÂàùÂßãÂåñ
+				lattice latChangeNum1 = (lattice)i.next();
+				latChangeNum1.numValue = 2 ;
+				lattice latChangeNum2 = (lattice)i.next();
+				latChangeNum2.numValue = 2 ;
+				changeLattice(latChangeNum1);
+				changeLattice(latChangeNum2);
 			}
-			latChangeNum.setForeground(Color.WHITE);
-			changeLattice(latChangeNum);
-		}else if(latNum==2) { 
-			//Ω¯––µ⁄“ª¥Œ≥ı ºªØ
-			lattice latChangeNum1 = (lattice)i.next();
-			latChangeNum1.numValue = 2 ;
-			lattice latChangeNum2 = (lattice)i.next();
-			latChangeNum2.numValue = 2 ;
-			changeLattice(latChangeNum1);
-			changeLattice(latChangeNum2);
+		}catch(NoSuchElementException e) {
+			cheakDead();
 		}
+		
 	}
 	public void changeLattice(lattice lat) {
 		int Num = lat.numValue ;
+		lat.setAlignment(java.awt.Label.CENTER);
 		if(Num==0) {
 			lat.setBackground(new Color(255,250,205));
 			lat.setText("");
@@ -177,8 +187,8 @@ class showMainWin extends Frame{
 			case 2048 : c_Num=11;
 			}
 			int c_a = 235 ;
-			int c_b = 230-c_Num*20 ;
-			int c_c = 230-c_Num*20 ;
+			int c_b = 230-c_Num*16 ;
+			int c_c = 230-c_Num*16 ;
 			lat.setBackground(new Color(c_a,c_b,c_c));
 			lat.setText(""+Num);
 		}
@@ -188,19 +198,15 @@ class showMainWin extends Frame{
 		int loc_x ;
 		int loc_y ;
 		lattice(){
-			//’‚¿Ô…Ë÷√ƒ¨»œlattice
+			//ËøôÈáåËÆæÁΩÆÈªòËÆ§lattice
 			setSize(125,125);
+			this.setAlignment(java.awt.Label.CENTER);
 			setBackground(new Color(255,250,205));
-			Font f_latNum = new Font("Arial",Font.BOLD,56);
+			Font f_latNum = new Font("Arial",Font.BOLD,52);
 			this.setForeground(Color.white);
 			this.setFont(f_latNum);
 			this.setText("");
 			this.setAlignment(SwingConstants.CENTER);
-		}
-	}
-	class numberLattice extends lattice {
-		numberLattice(int number){
-			
 		}
 	}
 	class keyMove extends KeyAdapter{
@@ -212,15 +218,31 @@ class showMainWin extends Frame{
 			if(e.getKeyCode()==KeyEvent.VK_W) {
 				moveUp();
 				launchLattice(1);
+				latticesNum ++ ;
+				if(latticesNum == 16) {
+					cheakDead();
+				}
 			}else if(e.getKeyCode()==KeyEvent.VK_S) {
 				moveDown();
 				launchLattice(1);
+				latticesNum ++ ;
+				if(latticesNum == 16) {
+					cheakDead();
+				}
 			}else if(e.getKeyCode()==KeyEvent.VK_A) {
 				moveLeft();
 				launchLattice(1);
+				latticesNum ++ ;
+				if(latticesNum == 16) {
+					cheakDead();
+				}
 			}else if(e.getKeyCode()==KeyEvent.VK_D) {
 				moveRight();
 				launchLattice(1);
+				latticesNum ++ ;
+				if(latticesNum == 16) {
+					cheakDead();
+				}
 			}
 		}
 		public void moveUp() {
@@ -240,12 +262,12 @@ class showMainWin extends Frame{
 //					System.out.println("!!!");
 					int x = w_lat.loc_x ;
 					int y = w_lat.loc_y ;
-//					System.out.println(x+"“™“∆∂Ø÷Æ«∞"+y);
+//					System.out.println(x+"Ë¶ÅÁßªÂä®‰πãÂâç"+y);
 					lat_around = latticebox[x-1][y-2];
-//					System.out.println(lat_around.loc_x+"…œ∑Ωµƒ"+lat_around.loc_y);
+//					System.out.println(lat_around.loc_x+"‰∏äÊñπÁöÑ"+lat_around.loc_y);
 					if(lat_around.numValue==0) {
 						int numValue = w_lat.numValue ;
-						//œÚ…œ“∆∂Ø“ª∏Ò
+						//Âêë‰∏äÁßªÂä®‰∏ÄÊ†º
 						lattice j ; 
 						j = w_lat ;
 						j.numValue = 0 ;
@@ -265,7 +287,7 @@ class showMainWin extends Frame{
 							changeLattice(k);
 							addScore(numValue*2);
 							cheakWin(w_lat);
-							cheakDead();
+							latticesNum -- ;
 					}else {
 					break ;
 					}
@@ -276,7 +298,7 @@ class showMainWin extends Frame{
 			for(int a=0;a<4;a++) {
 				for(int b=3;b>=0;b--) {
 					if(latticebox[a][b].numValue!=0) {
-//						System.out.println(latticebox[a][b].loc_x+"¥Ê‘⁄ ˝◊÷µƒ"+latticebox[a][b].loc_y);
+//						System.out.println(latticebox[a][b].loc_x+"Â≠òÂú®Êï∞Â≠óÁöÑ"+latticebox[a][b].loc_y);
 						d_list.add(latticebox[a][b]);
 					}
 				}
@@ -290,12 +312,12 @@ class showMainWin extends Frame{
 //					System.out.println("!!!");
 					int x = d_lat.loc_x ;
 					int y = d_lat.loc_y ;
-//					System.out.println(x+"“™“∆∂Ø÷Æ«∞"+y);
+//					System.out.println(x+"Ë¶ÅÁßªÂä®‰πãÂâç"+y);
 					lat_around = latticebox[x-1][y];
-//					System.out.println(lat_around.loc_x+"…œ∑Ωµƒ"+lat_around.loc_y);
+//					System.out.println(lat_around.loc_x+"‰∏äÊñπÁöÑ"+lat_around.loc_y);
 					if(lat_around.numValue==0) {
 						int numValue = d_lat.numValue ;
-						//œÚ…œ“∆∂Ø“ª∏Ò
+						//Âêë‰∏äÁßªÂä®‰∏ÄÊ†º
 						lattice j ; 
 						j = d_lat ;
 						j.numValue = 0 ;
@@ -315,7 +337,7 @@ class showMainWin extends Frame{
 							changeLattice(k);
 							addScore(numValue*2);
 							cheakWin(d_lat);
-							cheakDead();
+							latticesNum -- ;
 					}else {
 						break ;
 					}
@@ -340,7 +362,7 @@ class showMainWin extends Frame{
 					lat_around = latticebox[x-2][y-1];
 					if(lat_around.numValue==0) {
 						int numValue = l_lat.numValue ;
-						//œÚ…œ“∆∂Ø“ª∏Ò
+						//Âêë‰∏äÁßªÂä®‰∏ÄÊ†º
 						lattice j ; 
 						j = l_lat ;
 						j.numValue = 0 ;
@@ -360,7 +382,7 @@ class showMainWin extends Frame{
 							changeLattice(k);
 							addScore(numValue*2);
 							cheakWin(l_lat);
-							cheakDead();
+							latticesNum -- ;
 					}else {
 						break ;
 					}
@@ -385,7 +407,7 @@ class showMainWin extends Frame{
 					lat_around = latticebox[x][y-1];
 					if(lat_around.numValue==0) {
 						int numValue = r_lat.numValue ;
-						//œÚ…œ“∆∂Ø“ª∏Ò
+						//Âêë‰∏äÁßªÂä®‰∏ÄÊ†º
 						lattice j ; 
 						j = r_lat ;
 						j.numValue = 0 ;
@@ -405,7 +427,7 @@ class showMainWin extends Frame{
 							changeLattice(k);
 							addScore(numValue*2);
 							cheakWin(r_lat);
-							cheakDead();
+							latticesNum -- ;
 					}else {
 						break ;
 					}
@@ -426,6 +448,8 @@ class showMainWin extends Frame{
 			Button b_restart = new Button("PlayAgain");
 			Button b_exit = new Button("Exit");
 			b_exit.setFont(f_main);
+			b_exit.setForeground(new Color(210,180,140));
+			b_restart.setForeground(new Color(210,180,140));
 			b_restart.setFont(f_main);
 			b_restart.setBounds(200,200,200,100);
 			b_exit.setBounds(200,400,200,100);
@@ -433,7 +457,7 @@ class showMainWin extends Frame{
 			b_exit.setBackground(new Color(255,255,224));
 			winPanel.add(b_restart);
 			winPanel.add(b_exit);
-			panel.add(winPanel);
+			panel.add(winPanel,1);
 			b_exit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					System.exit(0);
@@ -445,20 +469,20 @@ class showMainWin extends Frame{
 						for(int b=0;b<4;b++) {
 							lattice lat = latticebox[a][b];
 							lat.numValue = 0 ;
+							changeLattice(lat);
 						}
 					}
+					launchLattice(2);
 					winPanel.setVisible(false);
 				}
 			});
 		}
 	}
 	public void cheakDead() {
-		int num = 0 ;
 		int aroundNum = 0;
 		for(int a=0;a<4;a++) {
 			for(int b=0;b<4;b++) {
 				if(latticebox[a][b].numValue!=0) {
-					num++;
 					lattice midLat = latticebox[a][b] ;
 					int midValue = midLat.numValue ;
 					try {
@@ -479,27 +503,30 @@ class showMainWin extends Frame{
 						aroundNum++;
 					}
 					}catch(Exception e) {
-						//≤ªø…±‹√‚µƒ°£
+						//‰∏çÂèØÈÅøÂÖçÁöÑ„ÄÇ
 					}
 				}
 			}
 		}
-		if(num==16&&aroundNum==0) {
-			// ‰¡À
+		if(aroundNum==0) {
+			checkTopScore(Integer.parseInt(score_label.getText()));
+			//Ëæì‰∫Ü
 			Panel losePanel = new Panel();
 			losePanel.setBackground(new Color(245,222,179));
 			losePanel.setBounds(0,0,600,800);
 			Button b_restart = new Button("ReTry");
 			Button b_exit = new Button("Exit");
 			b_exit.setFont(f_main);
+			b_exit.setForeground(new Color(210,180,140));
 			b_restart.setFont(f_main);
+			b_restart.setForeground(new Color(210,180,140));
 			b_restart.setBounds(200,200,200,100);
 			b_exit.setBounds(200,400,200,100);
 			b_restart.setBackground(new Color(255,255,224));
 			b_exit.setBackground(new Color(255,255,224));
 			losePanel.add(b_restart);
 			losePanel.add(b_exit);
-			panel.add(losePanel);
+			panel.add(losePanel,1);
 			b_exit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					System.exit(0);
@@ -511,8 +538,10 @@ class showMainWin extends Frame{
 						for(int b=0;b<4;b++) {
 							lattice lat = latticebox[a][b];
 							lat.numValue = 0 ;
+							changeLattice(lat);
 						}
 					}
+					launchLattice(2);
 					losePanel.setVisible(false);
 				}
 			});
@@ -551,6 +580,7 @@ class showMainWin extends Frame{
 	}
 	public void checkTopScore(int score) {
 		if(top_score<score) {
+			name_topScore.setText(""+score);
 			String top = ""+score;
 			Properties p_in = new Properties();
 			OutputStream fos = null ;
